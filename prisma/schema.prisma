@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String                 @id @default(uuid())
+  firstName         String
+  lastName          String?
+  email             String                 @unique
+  password          String
+  age               Int
+  title             String?
+  bio               String?
+  collage           String
+  graduationYear    Int
+  company           String?
+  experience        Int                    @default(0)
+  techStack         String?
+  posts             GeneralPost[]
+  queryPosts        QueryPost[]
+  socialHandles     SocialHandles?
+  followers         User[]                 @relation(name: "followers")
+  followedBy        User[]                 @relation(name: "followers")
+  likedGeneralPosts UserLikedGeneralPost[]
+  likedQueryPosts    UserLikedQueryPost[]
+  userComments      Comment[]
+  createdAt         DateTime               @default(now())
+}
+
+model SocialHandles {
+  id        String  @id @default(uuid())
+  userId    String  @unique
+  twitter   String?
+  instagram String?
+  linkedIn  String?
+  github    String?
+  portfolio String?
+  other     String?
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GeneralPost {
+  id          String                 @id @default(uuid())
+  userId      String
+  description String
+  likes       UserLikedGeneralPost[]
+  comments    Comment[]
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime               @default(now())
+}
+
+model QueryPost {
+  id          String               @id @default(uuid())
+  userId      String
+  title       String
+  description String
+  solved      Boolean              @default(false)
+  likes       UserLikedQueryPost[]
+  comments    Comment[]
+  createdAt   DateTime             @default(now())
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id            String       @id @default(uuid())
+  userId        String
+  generalPostId String?
+  queryPostId   String?
+  likes         Int         @default(0)
+  generalPost   GeneralPost? @relation(fields: [generalPostId], references: [id], onDelete: Cascade)
+  queryPost     QueryPost?   @relation(fields: [queryPostId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+
+}
+
+model UserLikedGeneralPost {
+  userId        String
+  generalPostId String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post          GeneralPost @relation(fields: [generalPostId], references: [id], onDelete: Cascade)
+
+  @@id([userId, generalPostId])
+}
+
+model UserLikedQueryPost {
+  userId      String
+  QueryPostId String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post        QueryPost @relation(fields: [QueryPostId], references: [id], onDelete: Cascade)
+
+  @@id([userId, QueryPostId])
+}
