@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { catchAsyncError } from "./catchAsyncError.js";
 import jwt from "jsonwebtoken";
-import { prisma } from "../app.js";
+import prisma from "../lib/d.js";
 import { JwtPayload, UserRequest, UserType } from "../types/types.js";
 import ErrorHandler from "../utilities/errorHandler.js";
-import { UserResponseType } from "../types/resTypes.js";
 
 
 export const authMiddleware = catchAsyncError(async(req:Request,res:Response,next:NextFunction) => {

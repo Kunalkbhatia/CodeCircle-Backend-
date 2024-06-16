@@ -1,4 +1,4 @@
-import { prisma } from "../app.js";
+import prisma from "../lib/d.js";
 import { NextFunction, Request, Response } from "express";
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import { UserLoginType, UserType } from "../types/types.js";
